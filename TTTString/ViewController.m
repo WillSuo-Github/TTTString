@@ -8,8 +8,11 @@
 
 #import "ViewController.h"
 #import "TTTAttributedLabel.h"
+#import "customCell.h"
 
-@interface ViewController ()<TTTAttributedLabelDelegate>
+@interface ViewController ()<TTTAttributedLabelDelegate,UITableViewDelegate,UITableViewDataSource>
+
+@property (nonatomic, strong) NSArray *sourceArr;
 
 @end
 
@@ -18,53 +21,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    NSString *str = @"ws：i love you";
+    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.frame];
+    [self.view addSubview:tableView];
     
-    
-    TTTAttributedLabel *label = [[TTTAttributedLabel alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
-    label.numberOfLines = 0;
-    label.delegate = self;
-    [label setText:str afterInheritingLabelAttributesAndConfiguringWithBlock:^NSMutableAttributedString *(NSMutableAttributedString *mutableAttributedString) {
-        
-        
-//        NSRange stringRange = NSMakeRange(0, mutableAttributedString.length);
-//        NSRegularExpression *regular = [[NSRegularExpression alloc] initWithPattern:@"^\\w+" options:NSRegularExpressionCaseInsensitive error:nil];
-//        NSRange nameRange = [regular rangeOfFirstMatchInString:[mutableAttributedString string] options:NSMatchingReportProgress range:stringRange];
-////        NSString *str = [mutableAttributedString attributedSubstringFromRange:nameRange].string;
-////        NSLog(@"%@",str);
-//
-//        UIFont *titleNameFont = [UIFont systemFontOfSize:17];
-//        CTFontRef titleRefFont = CTFontCreateWithName((__bridge CFStringRef)titleNameFont.fontName, titleNameFont.pointSize, NULL);
-//        
-//        if (titleRefFont) {
-//            [mutableAttributedString removeAttribute:(__bridge NSString *)kCTFontAttributeName range:nameRange];
-//            [mutableAttributedString addAttribute:(__bridge NSString *)kCTFontAttributeName value:(__bridge id _Nonnull)(titleRefFont) range:nameRange];
-//            CFRelease(titleRefFont);
-//        }
-//        
-//        [mutableAttributedString replaceCharactersInRange:nameRange withString:[[mutableAttributedString string] substringWithRange:nameRange]];
-//        
-//        
-        return mutableAttributedString;
-    }];
-    [self.view addSubview:label];
-    
-    NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
-    paragraph.alignment = NSTextAlignmentCenter;
-    
-    NSRange stringRange = NSMakeRange(0, [label.text length]);
-    NSRegularExpression *regular = [[NSRegularExpression alloc] initWithPattern:@"^\\w+" options:NSRegularExpressionCaseInsensitive error:nil];
-    NSRange nameRange = [regular rangeOfFirstMatchInString:label.text options:NSMatchingReportProgress range:stringRange];
-    NSURL *url = [NSURL URLWithString:@"www.baidu.com"];
-    label.linkAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:18],
-                                   NSParagraphStyleAttributeName:paragraph,
-                                   NSForegroundColorAttributeName:[UIColor redColor],
-                                   NSStrokeWidthAttributeName : @1,
-                                   NSStrokeColorAttributeName : [UIColor redColor]};
-    [label addLinkToURL:url withRange:nameRange];
-    [label sizeToFit];
-    
-    
+    tableView.delegate = self;
+    tableView.dataSource = self;
+
+    tableView.rowHeight = 200;
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label
@@ -76,6 +39,38 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    return self.sourceArr.count;
+}
+
+// Row display. Implementers should *always* try to reuse cells by setting each cell's reuseIdentifier and querying for available reusable cells with dequeueReusableCellWithIdentifier:
+// Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    customCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (cell == nil) {
+        cell = [[customCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    }
+    cell.label.delegate = self;
+    cell.titleStr = self.sourceArr[indexPath.row];
+    [cell layoutIfNeeded];
+    
+    return cell;
+}
+
+
+- (NSArray *)sourceArr{
+    
+    if (_sourceArr == nil) {
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"espressos" ofType:@"txt"];
+        _sourceArr = [[NSString stringWithContentsOfFile:filePath usedEncoding:nil error:nil] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    }
+    
+    return _sourceArr;
 }
 
 @end
