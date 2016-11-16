@@ -11,8 +11,7 @@
 
 @interface customCell : UITableViewCell
 
-@property (nonatomic, copy) NSString *titleStr;
-
-@property (nonatomic, strong) TTTAttributedLabel *label;
+@property (nonatomic, copy, readwrite) NSString *titleStr;
+@property (nonatomic, weak, readonly) TTTAttributedLabel *label;
 
 @end

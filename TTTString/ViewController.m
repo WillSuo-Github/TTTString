@@ -14,6 +14,8 @@
 
 @property (nonatomic, strong) NSArray *sourceArr;
 
+@property (nonatomic, strong) UITableView *myTableView;
+
 @end
 
 @implementation ViewController
@@ -21,13 +23,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.frame];
-    [self.view addSubview:tableView];
-    
-    tableView.delegate = self;
-    tableView.dataSource = self;
 
-    tableView.rowHeight = 200;
+    self.myTableView = ({
+        UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.frame];
+        [self.view addSubview:tableView];
+        tableView.delegate = self;
+        tableView.dataSource = self;
+        tableView.rowHeight = 200;
+        tableView;
+    });
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label
@@ -57,7 +61,6 @@
     }
     cell.label.delegate = self;
     cell.titleStr = self.sourceArr[indexPath.row];
-    [cell layoutIfNeeded];
     
     return cell;
 }
